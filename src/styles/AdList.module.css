@@ -1,0 +1,29 @@
+.listWrapper {
+  margin-top: 20px;
+  padding-bottom: 50px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr; 
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.loader {
+  text-align: center;
+  color: #ffa012;
+  margin-top: 50px;
+}
+
+.empty {
+  text-align: center;
+  color: #888;
+  font-size: 16px;
+  margin-top: 40px;
+}
