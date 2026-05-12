@@ -1,0 +1,90 @@
+/* src/styles/Categories.module.css */
+
+.categories {
+  display: grid;
+
+  grid-template-columns:
+    repeat(7,1fr);
+
+  gap: 18px;
+
+  margin-bottom: 40px;
+}
+
+.categories button {
+  position: relative;
+
+  height: 90px;
+
+  border: none;
+
+  border-radius: 26px;
+
+  background: white;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.06);
+
+  cursor: pointer;
+
+  transition: 0.3s;
+
+  font-size: 19px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  color: #555;
+}
+
+.categories button:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 15px 35px rgba(0,0,0,0.1);
+}
+
+.icon {
+  font-size: 24px;
+
+  display: flex;
+  align-items: center;
+}
+
+.active {
+  background:
+    linear-gradient(
+      135deg,
+      #ff5fa8,
+      #ff9ccd
+    ) !important;
+
+  color: white !important;
+}
+
+.badge {
+  position: absolute;
+
+  top: 10px;
+  right: 10px;
+
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+
+  background: #31c46c;
+
+  color: white;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

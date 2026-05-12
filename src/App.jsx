@@ -1,52 +1,268 @@
+// src/App.jsx
+
 import { useState } from "react";
-import AdForm from "./components/AdForm";
-import AdFilter from "./components/AdFilter";
-import AdList from "./components/AdList";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import styles from "./styles/App.module.css"; 
+
+import styles from "./styles/App.module.css";
+
+import Header from "./components/Header";
+import Categories from "./components/Categories";
+import ProductCard from "./components/ProductCard";
+import CartModal from "./components/CartModal";
+
+import productsData from "./data/products";
 
 function App() {
-  const [search, setSearch] = useState("");
-  const [activeSearch, setActiveSearch] = useState("");
-  const [category, setCategory] = useState("Баары");
-  const [sort, setSort] = useState("newest");
 
-  const handleSearchClick = () => {
-    setActiveSearch(search);
+  const [products, setProducts] =
+    useState(productsData);
+
+  const [cart, setCart] =
+    useState([]);
+
+  const [search, setSearch] =
+    useState("");
+
+  const [openCart, setOpenCart] =
+    useState(false);
+
+  const [activeCategory, setActiveCategory] =
+    useState("all");
+
+  // ЛАЙК
+  const toggleLike = (id) => {
+    setProducts(
+      products.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              liked: !item.liked,
+            }
+          : item
+      )
+    );
   };
 
-  return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <div className={styles.logoWrapper}>
-          <div className={styles.logoIcon}>
-            <span role="img" aria-label="cart">🛍️</span>
-          </div>
-          <div>
-            <h1 className={styles.title}>Marketplace</h1>
-            <p className={styles.subtitle}>Жарыялар платформасы</p>
-          </div>
-        </div>
-      </header>
+  // ДОБАВИТЬ В КОРЗИНУ
+  const addToCart = (product) => {
 
-      <AdFilter
+    setProducts(
+      products.map((item) =>
+        item.id === product.id
+          ? {
+              ...item,
+              added: true,
+            }
+          : item
+      )
+    );
+
+    const exist =
+      cart.find(
+        (item) =>
+          item.id === product.id
+      );
+
+    if (exist) {
+
+      setCart(
+        cart.map((item) =>
+          item.id === product.id
+            ? {
+                ...item,
+                qty:
+                  item.qty + 1,
+              }
+            : item
+        )
+      );
+
+    } else {
+
+      setCart([
+        ...cart,
+
+        {
+          ...product,
+          qty: 1,
+        },
+      ]);
+    }
+  };
+
+  // УДАЛИТЬ
+  const removeFromCart = (id) => {
+
+    setCart(
+      cart.filter(
+        (item) =>
+          item.id !== id
+      )
+    );
+
+    setProducts(
+      products.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              added: false,
+            }
+          : item
+      )
+    );
+  };
+
+  // УВЕЛИЧИТЬ
+  const increaseQty = (id) => {
+
+    setCart(
+      cart.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              qty:
+                item.qty + 1,
+            }
+          : item
+      )
+    );
+  };
+
+  // УМЕНЬШИТЬ
+  const decreaseQty = (id) => {
+
+    const product =
+      cart.find(
+        (item) =>
+          item.id === id
+      );
+
+    if (
+      product.qty === 1
+    ) {
+
+      removeFromCart(id);
+
+      return;
+    }
+
+    setCart(
+      cart.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              qty:
+                item.qty - 1,
+            }
+          : item
+      )
+    );
+  };
+
+  // ФИЛЬТР
+  const filteredProducts =
+    products.filter((item) => {
+
+      const matchSearch =
+        item.title
+          .toLowerCase()
+          .includes(
+            search.toLowerCase()
+          );
+
+      let matchCategory = true;
+
+      // ИЗБРАННОЕ
+      if (
+        activeCategory ===
+        "favorites"
+      ) {
+
+        matchCategory =
+          item.liked;
+      }
+
+      // ДРУГИЕ КАТЕГОРИИ
+      else if (
+        activeCategory !==
+        "all"
+      ) {
+
+        matchCategory =
+          item.category ===
+          activeCategory;
+      }
+
+      return (
+        matchSearch &&
+        matchCategory
+      );
+    });
+
+  return (
+    <div className={styles.app}>
+
+      <Header
+        cart={cart}
+        search={search}
         setSearch={setSearch}
-        setCategory={setCategory}
-        setSort={setSort}
-        onSearchClick={handleSearchClick}
+        setOpenCart={setOpenCart}
       />
 
-      <AdForm />
+      <Categories
+        activeCategory={
+          activeCategory
+        }
+        setActiveCategory={
+          setActiveCategory
+        }
+        products={products}
+      />
 
-      <div className={styles.listSection}>
-        <div className={styles.listHeader}>
-          <span>Жарыялар табылды</span>
-        </div>
-        <AdList search={activeSearch} category={category} sort={sort} />
+      <h2 className={styles.title}>
+        Найдено{" "}
+        {
+          filteredProducts.length
+        }{" "}
+        товаров
+      </h2>
+
+      <div className={styles.products}>
+
+        {filteredProducts.map(
+          (item) => (
+            <ProductCard
+              key={item.id}
+              item={item}
+              toggleLike={
+                toggleLike
+              }
+              addToCart={
+                addToCart
+              }
+            />
+          )
+        )}
+
       </div>
 
-      <ToastContainer position="bottom-right" />
+      {openCart && (
+        <CartModal
+          cart={cart}
+          setOpenCart={
+            setOpenCart
+          }
+          removeFromCart={
+            removeFromCart
+          }
+          increaseQty={
+            increaseQty
+          }
+          decreaseQty={
+            decreaseQty
+          }
+        />
+      )}
+
     </div>
   );
 }
